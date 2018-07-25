@@ -34,24 +34,26 @@ function dateFillAssistant(fieldName, idStart) {
     let day = document.querySelector(`#${idStart}_${fieldName}_day`);
     preventOverfill(day, max_chars);
     resetFieldData(day);
+    checkIsNumber(day);
 
     //set month helper
     let month = document.querySelector(`#${idStart}_${fieldName}_month`);        
     preventOverfill(month, max_chars);
     resetFieldData(month);
+    checkIsNumber(month);
 
     //set year helper
     let max_charsY = 4;
     let year = document.querySelector(`#${idStart}_${fieldName}_year`);  
     preventOverfill(year, max_charsY);
     resetFieldData(year);
-    
+    checkIsNumber(year);        
     
 }
 
 //check number of signs for field and prevent to pass more than is set
-function preventOverfill(fieldType, fieldLength) {
-    fieldType.addEventListener("keyup", function(e){
+function preventOverfill(fieldNameData, fieldLength) {
+    fieldNameData.addEventListener("keyup", function(e){
         
         if ($(this).val().length >= fieldLength) { 
             $(this).val($(this).val().substr(0, fieldLength));
@@ -66,10 +68,20 @@ function resetFieldData(fieldNameData) {
     };
 }
 
-//
+//check if only number is passed
+function checkIsNumber(fieldNameData) {
+    fieldNameData.addEventListener("keyup", function(e){        
+        if (isNaN($(this).val())) { 
+            fieldNameData.style.color = "red";
+        } else {
+            fieldNameData.style.color = "black";
+        }
+    });
+}
 //
 
-//call date assistant
+//call date assistant (pass only field name from form "fieldName")
 dateFillAssistant('fieldName', idStart);
 dateFillAssistant('fieldName2', idStart);
-//... pass any assistants You want
+//... pass as many as You want
+//enjoy
