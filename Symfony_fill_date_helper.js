@@ -27,27 +27,33 @@ for (let i=0; i < res.length; i++) {
     }        
 }
 
-function dateFillAssistant(fieldName, idStart) {
-    let max_chars = 2;
+function dateFillAssistant(idStart, fieldName, charsNumberDayMonth, charsNumberYear) {
+    //set values for inputs width
+    let multipler = 20;
+    let dayMonthFieldWidth = multipler * charsNumberDayMonth;
+    let yearFieldWidth = multipler * charsNumberYear;
 
     //set day helper
     let day = document.querySelector(`#${idStart}_${fieldName}_day`);
-    preventOverfill(day, max_chars);
+    
+    preventOverfill(day, charsNumberDayMonth);
     resetFieldData(day);
     checkIsNumber(day);
+    styleDates('day', dayMonthFieldWidth);
 
     //set month helper
     let month = document.querySelector(`#${idStart}_${fieldName}_month`);        
-    preventOverfill(month, max_chars);
+    preventOverfill(month, charsNumberDayMonth);
     resetFieldData(month);
     checkIsNumber(month);
+    styleDates('month', dayMonthFieldWidth);
 
     //set year helper
-    let max_charsY = 4;
     let year = document.querySelector(`#${idStart}_${fieldName}_year`);  
-    preventOverfill(year, max_charsY);
+    preventOverfill(year, charsNumberYear);
     resetFieldData(year);
-    checkIsNumber(year);        
+    checkIsNumber(year);  
+    styleDates('year', yearFieldWidth);      
     
 }
 
@@ -80,8 +86,24 @@ function checkIsNumber(fieldNameData) {
 }
 //
 
-//call date assistant (pass only field name from form "fieldName")
-dateFillAssistant('fieldName', idStart);
-dateFillAssistant('fieldName2', idStart);
+//set css style for dates
+function styleDates(inputName, fieldWidth) {
+    let inputs = document.querySelectorAll(`input[name*='[${inputName}]']`); 
+    
+    if (inputs.length > 0) {                    
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].style.position = 'relative';
+            inputs[i].style.width = `${fieldWidth}px`;
+        }
+    }
+}
+//
+
+/*
+ call date assistant 
+ (pass "field name" from form "fieldName" (formType), number of chars for day and month, number of chars for year)
+*/
+dateFillAssistant(idStart, 'fieldName', 2, 4);
+dateFillAssistant(idStart, 'fieldName', 2, 4);
 //... pass as many as You want
 //enjoy
