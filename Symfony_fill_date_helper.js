@@ -55,8 +55,8 @@ function dateFillAssistant(fieldName, idStart) {
 function preventOverfill(fieldNameData, fieldLength) {
     fieldNameData.addEventListener("keyup", function(e){
         
-        if ($(this).val().length >= fieldLength) { 
-            $(this).val($(this).val().substr(0, fieldLength));
+        if (this.value.length >= fieldLength) { 
+            this.value = this.value.substr(0, fieldLength);
         }
     });
 }
@@ -71,7 +71,7 @@ function resetFieldData(fieldNameData) {
 //check if only number is passed
 function checkIsNumber(fieldNameData) {
     fieldNameData.addEventListener("keyup", function(e){        
-        if (isNaN($(this).val())) { 
+        if (isNaN(this.value)) { 
             fieldNameData.style.color = "red";
         } else {
             fieldNameData.style.color = "black";
