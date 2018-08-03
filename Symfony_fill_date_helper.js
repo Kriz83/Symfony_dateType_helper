@@ -92,7 +92,7 @@ class DateFields
 
 }
 
-class FindDateForms
+class DateObjectCreator
 {
     constructor() {
         this.findDateForms();
@@ -117,12 +117,14 @@ class FindDateForms
                 idData = this.getFormName(inputs[i].getAttribute('id')); 
                 formObjects[i] = new DateFields(idData);
             }         
-        }
-        return formObjects;    
+        }   
     }
 
 }
 
-//set up assistants for all date fields
-const createObjectDates = new FindDateForms();
+/*
+    set up assistants for all date fields
+    DateObjectCreator gets all date forms and create object for each one
+*/
+const createObjectDates = new DateObjectCreator();
 //enjoy
