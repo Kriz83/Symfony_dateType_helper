@@ -21,7 +21,8 @@ class DateFields
         this.fieldName = fieldName;
         this.day = `#${fieldName}_day`;
         this.month = `#${fieldName}_month`;
-        this.year = `#${fieldName}_year`;
+        this.year = `#${fieldName}_year`;      
+        this.dateField = `#${fieldName}`;
         this.fieldWidthMultipler = 20;
         this.dayChars = 2; 
         this.monthChars = 2; 
@@ -89,15 +90,325 @@ class DateFields
             }
         });
     }
-
+   
 }
 
-class DateObjectCreator
+class CalendarIco
 {
-    constructor() {
-        this.findDateForms();
+    constructor(dateField) {
+        this.calendarIco = `${dateField}_calendarIco`;
+        this.dateField = dateField;
+        this.insertCalendarIco();
+    }
+
+    //insert calendar ico after year field
+    insertCalendarIco() {
+
+        let calendarSpan = document.createElement('span');
+        let yearField = document.querySelector(`#${this.dateField}_year`);
+        calendarSpan.className = 'glyphicon glyphicon-calendar';
+        calendarSpan.id = this.calendarIco;
+        let fieldName = this.dateField;
+
+        calendarSpan.onclick = function() {
+            let objectData = calendarObjectsData[fieldName];            
+            objectData.setState();
+        };
+        
+        yearField.parentNode.insertBefore(calendarSpan, yearField.nextSibling);
+    }
+}
+
+class DaySelector
+{
+    
+    constructor(dateField) {
+        this.calendarName = `${dateField}_calendar`;        
+        this.dateField = dateField;
     }
     
+    //check if leap year
+    leapYearCheck(year) {
+        if (year % 4 == 0 && year % 100 != 0 || year % 400 == 0)
+        {        
+            return [0,31,29,31,30,31,30,31,31,30,31,30,31];        
+        }
+        return [0,31,28,31,30,31,30,31,31,30,31,30,31];
+    }
+
+    createDayButtons(month, year) {
+        //get starting day for calendar
+        let startDay = new Date(`${year}-${month}-01`);                
+        let startWeekDay = startDay.getDay();
+        let buttonDay;  
+        let numberOfDaysInMonth = this.leapYearCheck(year); 
+        numberOfDaysInMonth = parseInt(numberOfDaysInMonth[month]) + startWeekDay; 
+        
+        //create week day names header
+        for (let i = 1; i <= 7; i++) {
+            this.createDayButton(i, 4);
+        }
+        //create days buttons
+        let i = 1;
+        while (i <= numberOfDaysInMonth) {
+            buttonDay = i - startWeekDay + 1;
+            if (i < numberOfDaysInMonth) {
+                if (i >= startWeekDay) {
+                    if (i % 7 == 6) {
+                        this.createDayButton(buttonDay, 2);
+                    } else if (i % 7 == 0) {
+                        this.createDayButton(buttonDay, 3);
+                    } else {
+                        this.createDayButton(buttonDay, 1);
+                    }
+                } else {
+                    this.createDayButton(buttonDay, 0);
+                }
+            }
+            i++;
+        }
+    }
+    
+    //onclick function change date and hide calendar
+    createOnclickDay(day, dateFieldData) {     
+        let calendarObjectData = calendarObjectsData[dateFieldData];
+        calendarObjectData.setDay(day); 
+    }
+
+    //create day buttons for month
+    createDayButton(day, type) {  
+
+        let dayButton = document.createElement('button');
+        let dateFieldData = this.dateField;
+        let createOnclickDay = this.createOnclickDay;
+        //set names for week days
+        const weekDayNames = ['','pon.','wt.','śr.','czw.','pt.','sob.','nd.'];
+        
+        dayButton.innerHTML = day;
+        dayButton.type = 'button';
+                
+        switch(type) {
+            case 0:
+                dayButton.className = 'calendar-day-empty';
+                document.querySelector(`#${this.dateField}_calendar`).appendChild(dayButton);
+                break;
+            case 1:
+                dayButton.onclick = function() {
+                    createOnclickDay(day, dateFieldData);
+                };
+                dayButton.className = 'calendar-day-week';
+                document.querySelector(`#${this.dateField}_calendar`).appendChild(dayButton);
+                break;
+            case 2:
+                dayButton.onclick = function() {
+                    createOnclickDay(day, dateFieldData);
+                };
+                dayButton.className = 'calendar-day-saturday';
+                document.querySelector(`#${this.dateField}_calendar`).appendChild(dayButton);
+                break;
+            case 3:
+                dayButton.onclick = function() {
+                    createOnclickDay(day, dateFieldData);
+                };
+                dayButton.className = 'calendar-day-sunday';
+                document.querySelector(`#${this.dateField}_calendar`).appendChild(dayButton);
+                break;
+            case 4:
+                dayButton.className = 'calendar-day-week-names';
+                dayButton.innerHTML = weekDayNames[day];
+                document.querySelector(`#${this.dateField}_calendar`).appendChild(dayButton);
+                break;
+        }        
+    }
+}
+
+class MonthSelector
+{
+    constructor(dateField) {
+        this.calendarName = `${dateField}_calendar`;
+        //set date data if fields are filled
+        this.today = new Date();
+        
+        if (document.querySelector(`#${dateField}_month`).value) {
+            this.month = parseInt(document.querySelector(`#${dateField}_month`).value);
+        } else {
+            this.month = parseInt(this.today.getMonth()) + 1; 
+        }
+        
+        this.dateField = dateField;
+
+    }
+
+    createMonthSelection(month, dateField) {
+        let increaseButton = document.createElement('button');        
+        let monthData = document.createElement('button');
+        let decreaseButton = document.createElement('button');
+
+        let yearChange = function(operator) {
+            let calendarObjectData = calendarObjectsData[dateField];
+            calendarObjectData.setYear(operator);
+        }
+
+        let monthChange = function(month) {
+            let calendarObjectData = calendarObjectsData[dateField];
+            calendarObjectData.setMonth(month);
+        }
+        //set names for months
+        const monthNames = ['','Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+
+        //create decrease button (to change month value)
+        decreaseButton.className = 'calendar-month-change';    
+        decreaseButton.innerHTML = '<';
+        decreaseButton.type = 'button';
+        document.querySelector(`#${this.dateField}_calendar`).appendChild(decreaseButton);
+        decreaseButton.onclick = function() {
+            month--;
+            if (month >= 1) {                
+                document.querySelector(`#${dateField}_month`).value = parseInt(month);
+                monthData.innerHTML = monthNames[month];
+                monthChange(month);
+            } else { 
+                month = 12;               
+                document.querySelector(`#${dateField}_month`).value = month;
+                monthData.innerHTML = monthNames[month];
+                monthChange(month);
+                yearChange('-');
+            }
+        };
+
+        //create month field (show selected month name)
+        monthData.innerHTML = monthNames[month];
+        monthData.className = 'calendar-month';
+        monthData.type = 'button';
+        document.querySelector(`#${this.dateField}_calendar`).appendChild(monthData);
+        
+        //create increase button (to change month value)
+        increaseButton.className = 'calendar-month-change';    
+        increaseButton.innerHTML = '>';
+        increaseButton.type = 'button';
+        document.querySelector(`#${this.dateField}_calendar`).appendChild(increaseButton);
+        increaseButton.onclick = function() {
+            month++;
+            if (month <= 12) {
+                document.querySelector(`#${dateField}_month`).value = parseInt(month);
+                monthData.innerHTML = monthNames[month];
+                monthChange(month);
+            } else {
+                month = 1;
+                document.querySelector(`#${dateField}_month`).value = month;
+                monthData.innerHTML = monthNames[month];
+                yearChange('+');
+                monthChange(month);
+            }
+        };  
+    }
+}
+
+class Calendar
+{
+    constructor(dateField, monthSelector, daySelector) {
+        this.calendarName = `${dateField}_calendar`;
+        //set date data if fields are filled
+        this.today = new Date();
+        //if fields are empty use today as start date
+        if (document.querySelector(`#${dateField}_day`).value) {
+            this.day = parseInt(document.querySelector(`#${dateField}_day`).value);
+        } else {
+            this.day = this.today.getDate();
+        }
+        if (document.querySelector(`#${dateField}_month`).value) {
+            this.month = parseInt(document.querySelector(`#${dateField}_month`).value);
+        } else {
+            this.month = parseInt(this.today.getMonth()) + 1; 
+        }
+        if (document.querySelector(`#${dateField}_year`).value) {
+            this.year = parseInt(document.querySelector(`#${dateField}_year`).value);
+        } else {
+            this.year = this.today.getFullYear();
+        }
+        
+        this.dateField = dateField;
+        this.state = 0;
+        //create calendar field
+        this.calendar = document.createElement('div');
+        this.createCalendar(this.calendar, this.calendarName, this.dateField);
+        
+        //create calendar body (month and day select)
+        this.monthSelector = monthSelector;
+        this.daySelector = daySelector;
+        this.createMonthSelection(this.monthSelector);
+        this.createDaySelection(this.daySelector);
+    }
+
+    //create calendar field
+    createCalendar(calendar, calendarName, dateField) {   
+        calendar.className = 'calendar';
+        calendar.id = calendarName;
+        calendar.style.display = 'none';        
+        document.querySelector(`#${dateField}`).appendChild(calendar);
+    }
+
+    //show / hide calendar
+    setState() {
+        if (this.state) {
+            this.state = 0;
+            this.calendar.style.display = 'none';
+        } else {
+            this.state = 1;
+            this.calendar.style.display = 'inline-block';
+        }
+    } 
+    
+    //change month state
+    setDay(day) {
+        this.day = day;
+        //fill date fields when day is changed
+        document.querySelector(`#${this.dateField}_day`).value = this.day;
+        document.querySelector(`#${this.dateField}_month`).value = this.month;
+        document.querySelector(`#${this.dateField}_year`).value = this.year;
+        this.setState();
+    }
+
+    //change month state
+    setMonth(month) {
+        this.month = month;
+        //fill date fields when month is changed
+        document.querySelector(`#${this.dateField}_day`).value = this.day;
+        document.querySelector(`#${this.dateField}_month`).value = this.month;
+        document.querySelector(`#${this.dateField}_year`).value = this.year;
+        //clear calendar field
+        document.querySelector(`#${this.dateField}_calendar`).innerHTML = '';
+        this.createMonthSelection(this.monthSelector);
+        this.createDaySelection(this.daySelector);
+    }
+
+    //show / hide calendar
+    setYear(operator) {
+        //change month and year value depend of year increase or decrease
+        if (operator == '+') {
+            this.year += 1;
+            document.querySelector(`#${this.dateField}_year`).value = this.year;
+        } else {
+            this.year -= 1;
+            document.querySelector(`#${this.dateField}_year`).value = this.year;
+        }
+    }  
+
+    //create month selection field
+    createMonthSelection(monthSelector) {
+        monthSelector.createMonthSelection(this.month, this.dateField);
+    }
+    //create day selection field
+    createDaySelection(daySelector) {
+        daySelector.createDayButtons(this.month, this.year);
+    }
+  
+        
+}
+
+//class that after get instantiate create date fill helpers and calendars for all dates on page
+class DateObjectCreator
+{    
     //cut name from id
     getFormName(formId) {
         let res = formId.split("_");
@@ -110,14 +421,20 @@ class DateObjectCreator
         let inputs = document.querySelectorAll(`input[name*='[day]']`); 
         let idData;
         let formObjects = [];
+        let calendarObjects = [];
+        let calendarIcoObjects = [];
 
         if (inputs.length > 0) { 
             for (let i=0; i < inputs.length; i++) { 
                 //get form names and create objects for all
                 idData = this.getFormName(inputs[i].getAttribute('id')); 
-                formObjects[i] = new DateFields(idData);
+                formObjects[idData] = new DateFields(idData);
+                //create arrays of calendar objects
+                calendarObjects[idData] = new Calendar(idData, new MonthSelector(idData), new DaySelector(idData));
+                calendarIcoObjects[idData] = new CalendarIco(idData);
             }         
-        }   
+        } 
+        return calendarObjects;  
     }
 
 }
@@ -127,4 +444,5 @@ class DateObjectCreator
     DateObjectCreator gets all date forms and create object for each one
 */
 const createObjectDates = new DateObjectCreator();
+const calendarObjectsData = createObjectDates.findDateForms();
 //enjoy
