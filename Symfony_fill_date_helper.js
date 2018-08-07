@@ -45,6 +45,7 @@ class DateFields
         this.resetFieldData(dayField);
         this.checkIsNumber(dayField);
         this.preventOverfill(dayField, this.dayChars);
+        this.checkDayChange(dayField, this.fieldName);
     }
 
     monthAssistant() {
@@ -93,6 +94,22 @@ class DateFields
         });
     }
 
+    //check if Day is changed to change Day value in calendar
+    checkDayChange(fieldNameData, fieldName) { 
+        fieldNameData.addEventListener("keyup", function(e){   
+            let calendarObjectData = calendarObjectsData[fieldName];    
+            calendarObjectData.changeDay(parseInt(this.value));
+        });
+    }
+
+    //check if Month is changed to change Month value in calendar
+    checkMonthChange(fieldNameData, fieldName) { 
+        fieldNameData.addEventListener("keyup", function(e){   
+            let calendarObjectData = calendarObjectsData[fieldName];    
+            calendarObjectData.changeMonth(parseInt(this.value));
+        });
+    }
+
     //check if year is changed to change year value in calendar
     checkYearChange(fieldNameData, fieldName) { 
         fieldNameData.addEventListener("keyup", function(e){   
@@ -100,14 +117,6 @@ class DateFields
             calendarObjectData.changeYear(parseInt(this.value));
         });
     } 
-
-    //check if Month is changed to change Month value in calendar
-    checkMonthChange(fieldNameData, fieldName) { 
-        fieldNameData.addEventListener("keyup", function(e){   
-            let calendarObjectData = calendarObjectsData[fieldName];    
-            calendarObjectData.setMonth(parseInt(this.value));
-        });
-    }
    
 }
 
@@ -243,18 +252,8 @@ class DaySelector
 class MonthSelector
 {
     constructor(dateField) {
-        this.calendarName = `${dateField}_calendar`;
-        //set date data if fields are filled
-        this.today = new Date();
-        
-        if (document.querySelector(`#${dateField}_month`).value) {
-            this.month = parseInt(document.querySelector(`#${dateField}_month`).value);
-        } else {
-            this.month = parseInt(this.today.getMonth()) + 1; 
-        }
-        
+        this.calendarName = `${dateField}_calendar`;        
         this.dateField = dateField;
-
     }
 
     createMonthSelection(month, dateField) {
@@ -334,8 +333,8 @@ class Calendar
         } else {
             this.day = this.today.getDate();
         }
-        if (document.querySelector(`#${dateField}_month`).value) {
-            this.month = parseInt(document.querySelector(`#${dateField}_month`).value);
+        if (document.querySelector(`#${dateField}_month`).value && !isNaN(parseInt(document.querySelector(`#${dateField}_month`).value))) {
+            this.month = parseInt(document.querySelector(`#${dateField}_month`).value);            
         } else {
             this.month = parseInt(this.today.getMonth()) + 1; 
         }
@@ -394,14 +393,27 @@ class Calendar
         this.setState();
     }
 
+    //change day value
+    changeDay(day) {        
+        this.day = day;
+    }
+
     //change month state
     setMonth(month) {
-        this.month = month;
+        if(!isNaN(parseInt(month))) {
+            this.month = month;
+        }            
         //fill date fields when month is changed
         document.querySelector(`#${this.dateField}_day`).value = this.day;
         document.querySelector(`#${this.dateField}_month`).value = this.month;
         document.querySelector(`#${this.dateField}_year`).value = this.year;
         //clear calendar field
+        this.resetCalendar();
+    }
+
+    //change month value
+    changeMonth(month) {        
+        this.month = month;
         this.resetCalendar();
     }
 
