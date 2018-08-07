@@ -13,6 +13,7 @@
     - It takes care to avoid pass more than x characters per field,
     - It clears field onclick
     - It checks if only numbers are passed (red font when not)
+    - It generates calendar to eisier pic dates
 */
 
 class DateFields
@@ -53,6 +54,7 @@ class DateFields
         this.resetFieldData(monthField);
         this.checkIsNumber(monthField);
         this.preventOverfill(monthField, this.monthChars);
+        this.checkMonthChange(monthField, this.fieldName);     
     }
 
     yearAssistant() {
@@ -62,6 +64,7 @@ class DateFields
         this.resetFieldData(yearField);
         this.checkIsNumber(yearField);
         this.preventOverfill(yearField, this.yearChars);
+        this.checkYearChange(yearField, this.fieldName);         
     }
 
     //reset field data onclick
@@ -70,13 +73,12 @@ class DateFields
             fieldNameData.value = '';        
         };
     }
-
-    //check number of signs for field and prevent to pass more than is set
-    preventOverfill(fieldNameData, fieldLength) {
+    //avoid to pass more characters than field Length
+    preventOverfill(fieldNameData, fieldLength) {   
         fieldNameData.addEventListener("keyup", function(e){        
             if (this.value.length >= fieldLength) { 
                 this.value = this.value.substr(0, fieldLength);
-            }
+            }              
         });
     }
     
@@ -88,6 +90,22 @@ class DateFields
             } else {
                 fieldNameData.style.color = "black";
             }
+        });
+    }
+
+    //check if year is changed to change year value in calendar
+    checkYearChange(fieldNameData, fieldName) { 
+        fieldNameData.addEventListener("keyup", function(e){   
+            let calendarObjectData = calendarObjectsData[fieldName];    
+            calendarObjectData.changeYear(parseInt(this.value));
+        });
+    } 
+
+    //check if Month is changed to change Month value in calendar
+    checkMonthChange(fieldNameData, fieldName) { 
+        fieldNameData.addEventListener("keyup", function(e){   
+            let calendarObjectData = calendarObjectsData[fieldName];    
+            calendarObjectData.setMonth(parseInt(this.value));
         });
     }
    
@@ -359,6 +377,13 @@ class Calendar
         }
     } 
     
+    resetCalendar() {        
+        //clear calendar field
+        document.querySelector(`#${this.dateField}_calendar`).innerHTML = '';
+        this.createMonthSelection(this.monthSelector);
+        this.createDaySelection(this.daySelector);
+    }
+
     //change month state
     setDay(day) {
         this.day = day;
@@ -377,14 +402,12 @@ class Calendar
         document.querySelector(`#${this.dateField}_month`).value = this.month;
         document.querySelector(`#${this.dateField}_year`).value = this.year;
         //clear calendar field
-        document.querySelector(`#${this.dateField}_calendar`).innerHTML = '';
-        this.createMonthSelection(this.monthSelector);
-        this.createDaySelection(this.daySelector);
+        this.resetCalendar();
     }
 
-    //show / hide calendar
+    //change year (increase / decrease by 1)
     setYear(operator) {
-        //change month and year value depend of year increase or decrease
+        //change year value depend of year increase or decrease
         if (operator == '+') {
             this.year += 1;
             document.querySelector(`#${this.dateField}_year`).value = this.year;
@@ -392,7 +415,14 @@ class Calendar
             this.year -= 1;
             document.querySelector(`#${this.dateField}_year`).value = this.year;
         }
-    }  
+    } 
+
+    //change year value
+    changeYear(year) {        
+        this.year = year;
+        //clear calendar field
+        this.resetCalendar();
+    }
 
     //create month selection field
     createMonthSelection(monthSelector) {
@@ -402,8 +432,7 @@ class Calendar
     createDaySelection(daySelector) {
         daySelector.createDayButtons(this.month, this.year);
     }
-  
-        
+      
 }
 
 //class that after get instantiate create date fill helpers and calendars for all dates on page
@@ -428,10 +457,11 @@ class DateObjectCreator
             for (let i=0; i < inputs.length; i++) { 
                 //get form names and create objects for all
                 idData = this.getFormName(inputs[i].getAttribute('id')); 
-                formObjects[idData] = new DateFields(idData);
                 //create arrays of calendar objects
                 calendarObjects[idData] = new Calendar(idData, new MonthSelector(idData), new DaySelector(idData));
                 calendarIcoObjects[idData] = new CalendarIco(idData);
+                //create date fill helpers
+                formObjects[idData] = new DateFields(idData);
             }         
         } 
         return calendarObjects;  
