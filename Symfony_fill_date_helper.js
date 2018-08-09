@@ -288,8 +288,8 @@ class MonthSelector
                 month = 12;               
                 document.querySelector(`#${dateField}_month`).value = month;
                 monthData.innerHTML = monthNames[month];
-                monthChange(month);
                 yearChange('-');
+                monthChange(month);
             }
         };
 
