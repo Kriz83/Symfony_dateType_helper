@@ -5,6 +5,7 @@ JS script to help with DateType field in Symfony3 when:
 are used to get 3 separate fields for day, month and year.
 
 Example:
+<pre>
 <br>
 "<br>
 ->add('bornDate', DateType::class, array(<br>
@@ -18,5 +19,6 @@ Example:
     )<br>
 )<br>
 "<br>
+</pre>
 
 Script add a calendar functionality to faster date pick too.
