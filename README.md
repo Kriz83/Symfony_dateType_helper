@@ -9,9 +9,9 @@ Example:
 <br>
 "<br>
 ->add('bornDate', DateType::class, array(<br>
-     &#9;'attr' => array(<br>
-           &#9;&#9;'class' => 'form-control',<br>
-           &#9;&#9;'style' => 'color:black; width:250px; height:40px'<br>
+     'attr' => array(<br>
+           'class' => 'form-control',<br>
+           'style' => 'color:black; width:250px; height:40px'<br>
       ),<br>
       'label' => 'Born date :',<br>
       'widget' => 'text',<br>
