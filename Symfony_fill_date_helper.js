@@ -209,7 +209,14 @@ class DaySelector
 
         let dayButton = document.createElement('button');
         //set names for week days
-        const weekDayNames = ['','pon.','wt.','śr.','czw.','pt.','sob.','nd.'];
+        let weekDayNames;
+        //set month names in Polish or English depend on browserlanguage
+        let userLang = navigator.language || navigator.userLanguage;
+        if (userLang == 'en-US') {
+            weekDayNames = ['','mon','tue','wed','th','fr','sat','sun'];
+        } else {
+            weekDayNames = ['','pon.','wt.','śr.','czw.','pt.','sob.','nd.'];
+        }
         
         dayButton.innerHTML = day;
         dayButton.type = 'button';
@@ -276,7 +283,14 @@ class MonthSelector
         let decreaseButton = document.createElement('button');
 
         //set names for months
-        const monthNames = ['','Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+        let monthNames;
+        //set month names in Polish or English depend on browserlanguage
+        let userLang = navigator.language || navigator.userLanguage;
+        if (userLang == 'en-US') {
+            monthNames = ['','January','Febuary','March','April','May','June','July','August','September','October','November','December'];
+        } else {
+            monthNames = ['','Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+        } 
 
         //create decrease button (to change month value)
         decreaseButton.className = 'calendar-month-change';    
